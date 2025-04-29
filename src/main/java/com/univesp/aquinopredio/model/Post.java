@@ -25,7 +25,6 @@ public class Post {
     @Size(min = 5, max = 500, message = "O atributo descrição deve conter no mínimo 5 e no máximo 500 caracteres. ")
     private String description;
 
-    @NotBlank(message = "O atributo data é obrigatório")
     @UpdateTimestamp
     private LocalDate postDate;
 
