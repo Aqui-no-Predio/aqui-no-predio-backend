@@ -36,7 +36,6 @@ public class Post {
         this.id = id;
     }
 
-
     public String getPostTitle() {
         return postTitle;
     }
