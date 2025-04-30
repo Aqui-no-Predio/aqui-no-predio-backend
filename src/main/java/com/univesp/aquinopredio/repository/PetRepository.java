@@ -1,0 +1,7 @@
+package com.univesp.aquinopredio.repository;
+
+import com.univesp.aquinopredio.model.Pet;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PetRepository extends JpaRepository<Pet, Long> {
+}
