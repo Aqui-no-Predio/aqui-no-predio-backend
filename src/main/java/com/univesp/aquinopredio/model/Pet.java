@@ -1,5 +1,6 @@
 package com.univesp.aquinopredio.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,7 @@ public class Pet {
     @Size(max = 150, message = "O atributo nome deve conter no máximo 150 caracteres. ")
     private String petName;
 
+    @Schema(example = "Cachorro, gato, roedor, réptil, outro")
     @NotBlank(message = "O atributo tipo é obrigatório")
     private String petType;
 

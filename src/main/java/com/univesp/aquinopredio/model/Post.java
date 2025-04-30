@@ -1,5 +1,6 @@
 package com.univesp.aquinopredio.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -19,6 +20,7 @@ public class Post {
     @Size(min = 5, max = 150, message = "O atributo título deve conter no mínimo 5 e no máximo 150 caracteres. ")
     private String postTitle;
 
+    @Schema(example = "Aviso ou Evento")
     @NotBlank(message = "O atributo tipo é obrigatório")
     private String postType;
 
