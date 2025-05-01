@@ -1,13 +1,13 @@
 package com.univesp.aquinopredio.controller;
 
 import com.univesp.aquinopredio.model.Post;
-import com.univesp.aquinopredio.repository.PostRepository;
+import com.univesp.aquinopredio.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,44 +18,50 @@ import java.util.Optional;
 public class PostController {
 
     @Autowired
-    private PostRepository postRepository;
+    private PostService postService;
 
     @GetMapping
-    public ResponseEntity<List<Post>> getAll() {
-        return ResponseEntity.ok(postRepository.findAll());
+    public ResponseEntity<List<Post>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getById(@PathVariable Long id) {
-        return postRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
+        Optional<Post> post = postService.getPostById(id);
+        if (post.isPresent()) {
+            return ResponseEntity.ok(post.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public ResponseEntity<Post> post(@Valid @RequestBody Post post) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(postRepository.save(post));
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Post> createPost(@Valid @RequestBody Post post) {
+        Post createdPost = postService.createPost(post);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
 
-    @PutMapping
-    public ResponseEntity<Post> put(@Valid @RequestBody Post post) {
-        return postRepository.findById(post.getId())
-                .map(response -> ResponseEntity.status(HttpStatus.OK)
-                        .body(postRepository.save(post)))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
-        Optional<Post> post = postRepository.findById(id);
-
-        if(post.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Post> updatePost(@PathVariable Long id, @Valid @RequestBody Post post) {
+        Post updatedPost = postService.updatePost(id, post);
+        if (updatedPost != null) {
+            return ResponseEntity.ok(updatedPost);
+        } else {
+            return ResponseEntity.notFound().build();
         }
+    }
 
-        postRepository.deleteById(id);
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+        boolean deleted = postService.deletePost(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
