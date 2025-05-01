@@ -35,7 +35,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails managerUser = User.withUsername("manager")
-                .password(passwordEncoder.encode("sua_chave_de_acesso_externa"))
+                .password(passwordEncoder.encode(jwtSecret))
                 .roles("MANAGER")
                 .build();
         return new InMemoryUserDetailsManager(managerUser);
