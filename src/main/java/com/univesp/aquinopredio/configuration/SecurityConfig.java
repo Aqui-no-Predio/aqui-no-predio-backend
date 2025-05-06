@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -72,12 +73,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/posts").permitAll()
-                        .requestMatchers("/posts/*").permitAll()
-                        .requestMatchers("/pets").permitAll()
                         .requestMatchers("/pets/**").permitAll()
-                        .requestMatchers("/services").permitAll()
+                        .requestMatchers("/pets").permitAll()
+                        .requestMatchers("/posts/**").permitAll()
+                        .requestMatchers("/posts").permitAll()
                         .requestMatchers("/services/**").permitAll()
+                        .requestMatchers("/services").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )

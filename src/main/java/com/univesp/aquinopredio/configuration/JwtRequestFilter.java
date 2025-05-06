@@ -1,4 +1,5 @@
 package com.univesp.aquinopredio.configuration;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,10 +12,28 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+
+    private static final List<String> IGNORING_PATHS = Arrays.asList(
+            "/auth/login",
+            "/pets",
+            "/pets/**",
+            "/posts",
+            "/posts/",
+            "/posts/*",
+            "/services",
+            "/services/",
+            "/services/**",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+    );
 
     public JwtRequestFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
@@ -24,6 +43,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+
+        String requestURI = request.getRequestURI();
+        if (isIgnoringPath(requestURI)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         final String authorizationHeader = request.getHeader("Authorization");
 
@@ -46,6 +71,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
+
         chain.doFilter(request, response);
+    }
+
+    private boolean isIgnoringPath(String requestURI) {
+        for (String ignoringPath : IGNORING_PATHS) {
+            if (requestURI.matches(ignoringPath.replace("**", ".*").replace("*", "[^/]*"))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
