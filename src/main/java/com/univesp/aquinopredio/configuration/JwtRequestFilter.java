@@ -52,16 +52,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         String method = request.getMethod();
 
-        logger.info("Processing request: Method={}, URI={}", method, requestURI);
-
         if (isIgnoringPath(requestURI) && (method.equals("GET") || method.equals("OPTIONS"))) {
-            logger.info("Ignoring path and method: Method={}, URI={}", method, requestURI);
             chain.doFilter(request, response);
             return;
         }
 
         if (requestURI.startsWith("/posts/") && method.equals("GET")) {
-            logger.info("Permitting GET for specific post URI: {}", requestURI);
             chain.doFilter(request, response);
             return;
         }
@@ -74,10 +70,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-            logger.info("Authorization Header found. Extracted JWT: {}", jwt);
             try {
                 username = jwtUtil.extractUsername(jwt);
-                logger.info("Username extracted from JWT: {}", username);
             } catch (Exception e) {
                 logger.error("Error extracting username from token: {}", e.getMessage());
             }
@@ -89,7 +83,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UserDetails userDetails = null;
             try {
                 userDetails = this.userDetailsService.loadUserByUsername(username);
-                logger.info("User details loaded for username: {}", username);
             } catch (Exception e) {
                 logger.error("Error loading user details for username {}: {}", username, e.getMessage());
             }
@@ -97,13 +90,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             if (userDetails != null) {
                 if (jwtUtil.validateToken(jwt, userDetails)) {
-                    logger.info("Token validated successfully for username: {}", username);
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken
                             .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                    logger.info("User authenticated in SecurityContextHolder: {}", username);
                 } else {
                     logger.warn("Token validation failed for username: {}", username);
                 }
