@@ -3,6 +3,7 @@ package com.univesp.aquinopredio.configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -75,8 +76,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/pets/**").permitAll()
                         .requestMatchers("/pets").permitAll()
-                        .requestMatchers("/posts/**").permitAll()
-                        .requestMatchers("/posts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/posts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/posts/*").permitAll()
                         .requestMatchers("/services/**").permitAll()
                         .requestMatchers("/services").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
@@ -90,4 +91,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }
