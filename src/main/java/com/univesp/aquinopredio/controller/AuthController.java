@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,6 +37,11 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/check")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> checkAuthentication() {
+        return ResponseEntity.ok().build();
+    }
 }
 
 class AuthRequest {
